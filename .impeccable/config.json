@@ -1,0 +1,15 @@
+{
+  "buildPath": "code",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-radius",
+        "value": "4px",
+        "createdAt": "2026-08-30T13:15:08.569Z",
+        "reason": "global :focus-visible outline radius on arbitrary elements, not a component shape from the rounded scale"
+      }
+    ]
+  }
+}

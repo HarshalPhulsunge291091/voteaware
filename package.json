@@ -1,0 +1,36 @@
+{
+  "name": "voteaware",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint",
+    "preview": "vite preview",
+    "pipeline:sansad": "node scripts/pipeline/fetch-sansad.mjs",
+    "pipeline:prs": "node scripts/pipeline/fetch-prs.mjs",
+    "pipeline:myneta": "node scripts/pipeline/fetch-myneta.mjs",
+    "pipeline:mplads": "node scripts/pipeline/fetch-mplads.mjs",
+    "pipeline:merge": "node scripts/pipeline/merge.mjs",
+    "pipeline:sync": "node scripts/pipeline/sync-to-app.mjs",
+    "pipeline:all": "npm run pipeline:sansad && npm run pipeline:prs && npm run pipeline:myneta && npm run pipeline:mplads && npm run pipeline:merge && npm run pipeline:sync"
+  },
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^6.1.0",
+    "oxlint": "^1.79.0",
+    "playwright": "^1.62.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.2"
+  }
+}

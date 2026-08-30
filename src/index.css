@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+  /* Ground */
+  --color-ink: #0a0b14;
+  --color-ink-raised: #12141f;
+  --color-ink-card: #171a28;
+  --color-ink-border: #262a3d;
+
+  /* Ledger paper (light surfaces on dark ground) */
+  --color-paper: #f4f3f8;
+  --color-paper-dim: #d9d8e3;
+
+  /* Signature accent — indigo-violet, distinct from PhonePe purple / GPay blue */
+  --color-accent: #6d4aff;
+  --color-accent-soft: #241c47;
+  --color-accent-strong: #8a6bff;
+
+  /* Status */
+  --color-good: #22c55e;
+  --color-good-soft: #12271b;
+  --color-warn: #f5a524;
+  --color-warn-soft: #2b2211;
+  --color-bad: #f04438;
+  --color-bad-soft: #2c1717;
+
+  --color-text-hi: #f4f3f8;
+  --color-text-mid: #a7a6bd;
+  --color-text-low: #6d6c85;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -8px rgba(0, 0, 0, 0.5);
+  --shadow-raised: 0 2px 4px rgba(0, 0, 0, 0.5), 0 16px 40px -12px rgba(109, 74, 255, 0.25);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-text-hi);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-text-hi);
+}
+
+* {
+  scrollbar-color: var(--color-ink-border) var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent-strong);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,116 @@
+{
+  "title": "Choose VoteAware's visual world",
+  "question": "The roll assigned Election Ink & Ballot Ledger. Keep it, take an alternate, or re-roll.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Election Ink & Ballot Ledger",
+      "kicker": "THE ROLL",
+      "lineage": "Indian indelible voting ink, ballot papers, EVM button grids, official rubber-stamp seals",
+      "thesis": "Every MP's record rendered as a stamped ballot ledger — the one indelible mark that proves you actually voted, now proving whether they delivered.",
+      "palette": ["#120f1c", "#f4ede1", "#5b1fb0", "#8b2fe0", "#d9cdb8"],
+      "materials": ["rubber-stamp ink bleed", "ballot-paper cream stock", "EVM button grid", "perforated counterfoil edges"],
+      "viewport": "A single oversized ink-stamp grade slams onto a sample MP's name; below it a ballot-slip search field ('Find your constituency') marked in the same indelible purple as the stamp.",
+      "risk": "Tips into gimmicky novelty if the stamp/ink motif is overused instead of reserved for verdicts.",
+      "raised": [
+        { "from": "challenger-splitflap", "raise": "Dense tables (MP list, fund ledger) use split-flap's cascading row-update rhythm and strict ruled-row/column discipline instead of ordinary rows." },
+        { "from": "challenger-patent", "raise": "Tapping any grade component draws a thin leader line to the exact fund-data row it came from — full traceability, borrowed as an annotation grammar only." },
+        { "from": "declined-ekiben", "raise": "The scorecard's category summary doubles as a numbered map you navigate the page by, the way a bento box's lid diagram indexes its compartments." }
+      ],
+      "wireframe": {
+        "cols": 12, "rows": 10,
+        "regions": [
+          { "label": "nav: VoteAware wordmark + About/Method", "x": 0, "y": 0, "w": 12, "h": 1 },
+          { "label": "hero: oversized ink-stamp grade on sample MP", "x": 0, "y": 1, "w": 7, "h": 4, "accent": true },
+          { "label": "ballot-slip search input (constituency/MP/state)", "x": 0, "y": 5, "w": 7, "h": 1, "accent": true },
+          { "label": "side rail: ballot-row ticker of sample MPs (name, party symbol, stamp grade)", "x": 7, "y": 1, "w": 5, "h": 6 },
+          { "label": "trust strip: data-source counterfoil (MPLADS, PRS, ECI)", "x": 0, "y": 6, "w": 7, "h": 1 },
+          { "label": "footer: disclaimer + non-partisan note", "x": 0, "y": 9, "w": 12, "h": 1 }
+        ]
+      }
+    },
+    {
+      "id": "model-pick",
+      "label": "UPI Ledger",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "PhonePe/GPay transaction history and balance receipts",
+      "thesis": "Your MP's public money, rendered exactly like the private money you check every day: debited, credited, balance.",
+      "palette": ["#0b0d17", "#ffffff", "#5f2ee5", "#22c55e", "#f2f2f7"],
+      "materials": ["receipt paper", "rounded transaction cards", "status pill chips"],
+      "viewport": "A balance-style hero number (funds unspent) tops a receipt-style scrollable list of MPs, each row reading like a transaction: allotted / spent / balance.",
+      "risk": "Also the direction most civic-fintech-adjacent apps in this category land on — immediately legible, but not distinctive against every payment app on a young voter's phone.",
+      "wireframe": {
+        "cols": 12, "rows": 10,
+        "regions": [
+          { "label": "balance-style hero: total unspent across tracked MPs", "x": 0, "y": 0, "w": 12, "h": 3, "accent": true },
+          { "label": "pay-to style search bar", "x": 0, "y": 3, "w": 12, "h": 1, "accent": true },
+          { "label": "receipt list: MP rows as transaction entries", "x": 0, "y": 4, "w": 12, "h": 5 },
+          { "label": "footer", "x": 0, "y": 9, "w": 12, "h": 1 }
+        ]
+      }
+    },
+    {
+      "id": "challenger-splitflap",
+      "label": "Concourse Departure Board",
+      "verdict": "competitive",
+      "lineage": "Rail/metro split-flap departure boards",
+      "thesis": "MPs ranked live like train departures — on-time, delayed, or cancelled, by fund utilization instead of platform.",
+      "palette": ["#0a0a0a", "#f5f5f0", "#e8a400", "#c81e1e"],
+      "materials": ["matte black flap faces", "brushed steel frame", "amber delay lamps"],
+      "case": "Fuses cleanly for the ranked MP list and live-update states; loses to the assigned direction on identifying with voting/politics specifically — transit is a real but tangential association.",
+      "risk": "Reads as a transit-app clone if the flap motif isn't reserved for genuine state changes.",
+      "wireframe": {
+        "cols": 12, "rows": 10,
+        "regions": [
+          { "label": "board frame header", "x": 0, "y": 0, "w": 12, "h": 1 },
+          { "label": "hero split-flap verdict panel", "x": 0, "y": 1, "w": 12, "h": 3, "accent": true },
+          { "label": "departure-board style MP ranking table", "x": 0, "y": 4, "w": 12, "h": 5 },
+          { "label": "footer", "x": 0, "y": 9, "w": 12, "h": 1 }
+        ]
+      }
+    },
+    {
+      "id": "challenger-patent",
+      "label": "Exploded Specification Sheet",
+      "verdict": "competitive",
+      "lineage": "Utility patent drawing sheets — numbered figures, leader lines, ink hatching",
+      "thesis": "A grade exploded into its numbered parts, every figure tied by a leader line to the exact clause of spending it proves.",
+      "palette": ["#ffffff", "#111111", "#9c1c1c"],
+      "materials": ["india ink line", "white bond paper", "curved leader lines", "section hatching"],
+      "case": "Fuses well with the product's traceability principle — strong product clarity for 'why this grade' — but the patent-office register is less culturally familiar to young Indian voters than ballot ephemera.",
+      "risk": "Can feel cold/technical if the ink-line discipline isn't warmed by the ballot palette around it.",
+      "wireframe": {
+        "cols": 12, "rows": 10,
+        "regions": [
+          { "label": "ruled border header", "x": 0, "y": 0, "w": 12, "h": 1 },
+          { "label": "exploded hero figure: grade broken into numbered parts", "x": 0, "y": 1, "w": 7, "h": 5 },
+          { "label": "leader-line annotated spec list", "x": 7, "y": 1, "w": 5, "h": 5, "accent": true },
+          { "label": "search/query bar", "x": 0, "y": 6, "w": 12, "h": 1 },
+          { "label": "footer", "x": 0, "y": 9, "w": 12, "h": 1 }
+        ]
+      }
+    }
+  ],
+  "reroll": { "registers": ["safer", "bolder"] },
+  "buildPath": { "value": "code", "toggle": false },
+  "canon": true,
+  "canonCard": {
+    "label": "The category standard",
+    "thesis": "The generic civic-dashboard look: tricolor accents, an official emblem, blue-and-white stat cards.",
+    "palette": ["#ffffff", "#0b3d91", "#138808", "#111827"],
+    "materials": ["clean grid", "flat icon tiles", "stock civic photography"],
+    "viewport": "The government-portal arrangement every visitor already expects, executed at full craft.",
+    "risk": "Indistinguishable from every other civic-tech dashboard, including the andhbhakt project this app is modeled after — no memorable identity of its own.",
+    "wireframe": {
+      "cols": 12, "rows": 10,
+      "regions": [
+        { "label": "header with emblem/logo", "x": 0, "y": 0, "w": 12, "h": 1 },
+        { "label": "hero banner", "x": 0, "y": 1, "w": 12, "h": 2 },
+        { "label": "3-card stat grid", "x": 0, "y": 3, "w": 12, "h": 2 },
+        { "label": "MP list/table", "x": 0, "y": 5, "w": 12, "h": 4 },
+        { "label": "footer", "x": 0, "y": 9, "w": 12, "h": 1 }
+      ]
+    }
+  },
+  "steer": true
+}
