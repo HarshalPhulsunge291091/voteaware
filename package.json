@@ -11,18 +11,24 @@
     "pipeline:sansad": "node scripts/pipeline/fetch-sansad.mjs",
     "pipeline:prs": "node scripts/pipeline/fetch-prs.mjs",
     "pipeline:myneta": "node scripts/pipeline/fetch-myneta.mjs",
+    "pipeline:myneta-candidates": "node scripts/pipeline/fetch-myneta-candidates.mjs",
     "pipeline:mplads": "node scripts/pipeline/fetch-mplads.mjs",
     "pipeline:merge": "node scripts/pipeline/merge.mjs",
     "pipeline:sync": "node scripts/pipeline/sync-to-app.mjs",
-    "pipeline:all": "npm run pipeline:sansad && npm run pipeline:prs && npm run pipeline:myneta && npm run pipeline:mplads && npm run pipeline:merge && npm run pipeline:sync"
+    "pipeline:geo-boundaries": "node scripts/pipeline/fetch-constituency-boundaries.mjs",
+    "pipeline:geo-build": "node scripts/pipeline/build-geo.mjs",
+    "pipeline:all": "npm run pipeline:sansad && npm run pipeline:prs && npm run pipeline:myneta && npm run pipeline:myneta-candidates && npm run pipeline:mplads && npm run pipeline:merge && npm run pipeline:sync && npm run pipeline:geo-boundaries && npm run pipeline:geo-build"
   },
   "dependencies": {
+    "d3-geo": "^3.1.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.3"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@turf/turf": "^7.4.0",
+    "@types/d3-geo": "^3.1.1",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",

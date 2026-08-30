@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getMPById, unspentCr, utilizationPct } from "../data/mps";
+import { getMPById, loadCandidates, unspentCr, utilizationPct, type Candidate } from "../data/mps";
 import { GradeBadge } from "../components/GradeBadge";
 import { StatusPill } from "../components/StatusPill";
 
@@ -10,6 +11,18 @@ function formatRupees(amount: number): string {
 export function MPDetail() {
   const { id } = useParams<{ id: string }>();
   const mp = id ? getMPById(id) : undefined;
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+
+  useEffect(() => {
+    if (!mp) return;
+    let cancelled = false;
+    loadCandidates(mp.id).then((c) => {
+      if (!cancelled) setCandidates(c);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [mp]);
 
   if (!mp) {
     return (
@@ -231,6 +244,50 @@ export function MPDetail() {
           </a>
         )}
       </section>
+
+      {/* Other candidates in this constituency */}
+      {candidates.length > 0 && (
+        <section className="mt-8 mb-4">
+          <h2 className="font-display text-lg font-bold text-[var(--color-text-hi)]">
+            Who else ran in {mp.constituency}
+          </h2>
+          <p className="mt-1 text-sm text-[var(--color-text-mid)]">
+            {candidates.length - 1} other candidate
+            {candidates.length - 1 === 1 ? "" : "s"} contested this seat and lost. MyNeta
+            doesn't publish vote counts, so this is affidavit data only — party, criminal cases,
+            and declared assets — not a results ranking.
+          </p>
+          <ul className="mt-4 space-y-2.5">
+            {candidates
+              .filter((c) => !c.isWinner)
+              .sort((a, b) => (b.totalAssetsRs ?? -1) - (a.totalAssetsRs ?? -1))
+              .map((c) => (
+                <li
+                  key={c.candidateId}
+                  className="flex items-center justify-between gap-4 rounded-xl bg-[var(--color-ink-raised)] px-4 py-3.5"
+                >
+                  <div className="min-w-0">
+                    <a
+                      href={c.sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="truncate font-medium text-[var(--color-text-hi)] hover:text-[var(--color-accent-strong)]"
+                    >
+                      {c.name}
+                    </a>
+                    <p className="mt-0.5 text-xs text-[var(--color-text-low)]">
+                      {c.party ?? "Independent"}
+                      {c.criminalCases > 0 && ` · ${c.criminalCases} criminal case${c.criminalCases === 1 ? "" : "s"}`}
+                    </p>
+                  </div>
+                  <p className="tabular shrink-0 text-sm font-semibold text-[var(--color-text-hi)]">
+                    {c.totalAssetsRs !== null ? formatRupees(c.totalAssetsRs) : "—"}
+                  </p>
+                </li>
+              ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

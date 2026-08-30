@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MPS, unspentCr, utilizationPct } from "../data/mps";
 import { GradeBadge } from "../components/GradeBadge";
+import { IndiaMap, type StateProperties } from "../components/IndiaMap";
+import { StatePanel } from "../components/StatePanel";
 import { useCountUp } from "../hooks/useCountUp";
 
 const WITH_FUNDS = MPS.filter((mp) => mp.fundsUnspentCr !== null);
@@ -11,6 +13,7 @@ const FEATURED = [...WITH_FUNDS].sort((a, b) => unspentCr(b) - unspentCr(a)).sli
 
 export function Home() {
   const [query, setQuery] = useState("");
+  const [selectedState, setSelectedState] = useState<StateProperties | null>(null);
   const navigate = useNavigate();
   const tallied = useCountUp(TOTAL_UNSPENT);
 
@@ -78,6 +81,24 @@ export function Home() {
           </div>
         </form>
       </section>
+
+      {/* National map: state colored by leading party, click to drill in */}
+      <section className="border-b border-[var(--color-ink-border)] px-5 py-12 sm:px-8 sm:py-16">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="font-display text-xl font-bold text-[var(--color-text-hi)]">
+            Every state, by who's leading it
+          </h2>
+          <p className="mx-auto mt-2 max-w-lg text-sm text-[var(--color-text-mid)]">
+            Shaded by the party holding the most Lok Sabha seats in that state. Click a state to
+            see its constituencies and unspent MPLADS funds.
+          </p>
+          <div className="mt-8">
+            <IndiaMap onSelectState={setSelectedState} selectedSlug={selectedState?.slug ?? null} />
+          </div>
+        </div>
+      </section>
+
+      {selectedState && <StatePanel state={selectedState} onClose={() => setSelectedState(null)} />}
 
       {/* Receipt-style MP feed */}
       <section className="border-b border-[var(--color-ink-border)] px-5 py-12 sm:px-8 sm:py-16">

@@ -1,19 +1,23 @@
+import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import { NavBar } from "./components/NavBar";
-import { Home } from "./pages/Home";
-import { MPList } from "./pages/MPList";
-import { MPDetail } from "./pages/MPDetail";
+
+const Home = lazy(() => import("./pages/Home").then((m) => ({ default: m.Home })));
+const MPList = lazy(() => import("./pages/MPList").then((m) => ({ default: m.MPList })));
+const MPDetail = lazy(() => import("./pages/MPDetail").then((m) => ({ default: m.MPDetail })));
 
 function App() {
   return (
     <div className="flex min-h-svh flex-col">
       <NavBar />
       <main className="flex-1">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/mps" element={<MPList />} />
-          <Route path="/mps/:id" element={<MPDetail />} />
-        </Routes>
+        <Suspense fallback={null}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/mps" element={<MPList />} />
+            <Route path="/mps/:id" element={<MPDetail />} />
+          </Routes>
+        </Suspense>
       </main>
       <footer className="border-t border-[var(--color-ink-border)] px-5 py-8 sm:px-8">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 text-xs text-[var(--color-text-low)] sm:flex-row sm:items-center sm:justify-between">

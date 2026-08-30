@@ -2,6 +2,19 @@ import rawMps from "./mps-merged.json";
 
 export type Grade = "A" | "B" | "C" | "D" | "F" | "N/A";
 
+export interface Candidate {
+  candidateId: number;
+  sourceUrl: string;
+  name: string;
+  isWinner: boolean;
+  party: string | null;
+  criminalCases: number;
+  education: string | null;
+  age: number | null;
+  totalAssetsRs: number | null;
+  liabilitiesRs: number | null;
+}
+
 interface MergedRecord {
   id: string;
   name: string;
@@ -129,4 +142,13 @@ export function unspentCr(mp: MP): number {
 
 export function utilizationPct(mp: MP): number | null {
   return mp.fundsUtilizationPct !== null ? Math.round(mp.fundsUtilizationPct) : null;
+}
+
+// Candidates (winner + everyone who lost, per constituency) live in their
+// own file, not embedded per-MP in mps-merged.json — 7,441 records across
+// 463 constituencies would otherwise bloat the eagerly-loaded bundle every
+// page pays for. Loaded on demand, only when an MP's page is opened.
+export async function loadCandidates(mpId: string): Promise<Candidate[]> {
+  const all = (await import("./mp-candidates.json")).default as Record<string, Candidate[]>;
+  return all[mpId] ?? [];
 }
