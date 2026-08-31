@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
+    "deploy": "npm run build && npx wrangler deploy",
     "pipeline:sansad": "node scripts/pipeline/fetch-sansad.mjs",
     "pipeline:prs": "node scripts/pipeline/fetch-prs.mjs",
     "pipeline:myneta": "node scripts/pipeline/fetch-myneta.mjs",
