@@ -33,6 +33,13 @@
 
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -8px rgba(0, 0, 0, 0.5);
   --shadow-raised: 0 2px 4px rgba(0, 0, 0, 0.5), 0 16px 40px -12px rgba(109, 74, 255, 0.25);
+
+  /* Confident arrival curve — used for every entrance in the system. */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* One step above the display size, reserved for the landing wordmark and
+     nothing else — see DESIGN.md typography. */
+  --text-wordmark: clamp(3rem, 11vw, 5rem);
 }
 
 html {
@@ -63,4 +70,238 @@ body {
 
 .tabular {
   font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------------
+   The ledger grid
+   ---------------------------------------------------------------------------
+   The landing hero sits on a drifting two-layer measurement grid: a fine 40px
+   cell on the near plane, and a 160px cell moving at a quarter of the speed on
+   the far one. It is this product's "ledger paper" made literal — ruled lines
+   under the numbers — and the parallax between the two layers is what keeps it
+   reading as a live instrument rather than wallpaper.
+
+   Each layer translates by exactly one cell before looping, so the tiling is
+   seamless. Transform (not background-position) so the whole thing stays on the
+   compositor and never repaints.
+--------------------------------------------------------------------------- */
+.ledger-grid {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* Dissolve toward the edges and the bottom so the grid never competes with
+     the wordmark or collides with the section hairline below it. */
+  -webkit-mask-image: radial-gradient(120% 90% at 50% 28%, #000 0%, #000 42%, transparent 78%);
+  mask-image: radial-gradient(120% 90% at 50% 28%, #000 0%, #000 42%, transparent 78%);
+}
+
+.ledger-grid::before,
+.ledger-grid::after {
+  content: "";
+  position: absolute;
+  /* Oversized so the translating tile never exposes an edge. */
+  inset: -20%;
+  will-change: transform;
+}
+
+.ledger-grid::before {
+  background-image:
+    linear-gradient(to right, rgba(109, 74, 255, 0.13) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(109, 74, 255, 0.13) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: grid-drift-near 14s linear infinite;
+}
+
+.ledger-grid::after {
+  background-image:
+    linear-gradient(to right, rgba(167, 166, 189, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(167, 166, 189, 0.1) 1px, transparent 1px);
+  background-size: 160px 160px;
+  animation: grid-drift-far 56s linear infinite;
+}
+
+@keyframes grid-drift-near {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(40px, 40px, 0);
+  }
+}
+
+@keyframes grid-drift-far {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(160px, 160px, 0);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Hero wordmark
+   ---------------------------------------------------------------------------
+   Letters rise out of a clipped baseline, left to right — the ledger printing
+   its own header. Staggered per letter from the component.
+--------------------------------------------------------------------------- */
+.wordmark-letter {
+  display: inline-block;
+  animation: letter-rise 720ms var(--ease-out-expo) both;
+}
+
+@keyframes letter-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.52em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Underscore that draws itself under the wordmark once the letters land. */
+.wordmark-rule {
+  transform-origin: center;
+  animation: rule-draw 640ms var(--ease-out-expo) both;
+}
+
+@keyframes rule-draw {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+/* Supporting copy and controls settle after the wordmark, never before it. */
+.settle-in {
+  animation: settle 640ms var(--ease-out-expo) both;
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Map
+   ---------------------------------------------------------------------------
+   States resolve one by one from north to south, so the country assembles
+   itself instead of fading in as a single block. The entrance lives on a
+   wrapping <g> and the hover lift lives on the <path>, so a keyframe animation
+   and a transition never fight over the same transform.
+--------------------------------------------------------------------------- */
+.map-state-enter {
+  animation: state-resolve 520ms var(--ease-out-expo) both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes state-resolve {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.map-state {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    transform 240ms var(--ease-out-expo),
+    fill-opacity 200ms ease-out;
+  cursor: pointer;
+}
+
+/* The lifted copy is drawn on a layer above every other state (SVG has no
+   z-index), which is why the lift lives here and not on the base path. */
+.map-state-lift {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: translateY(-5px) scale(1.045);
+  transition: transform 240ms var(--ease-out-expo);
+  pointer-events: none;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.55));
+}
+
+/* ---------------------------------------------------------------------------
+   State panel
+--------------------------------------------------------------------------- */
+.panel-backdrop {
+  animation: backdrop-in 260ms ease-out both;
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(6px);
+  }
+}
+
+.panel-sheet {
+  animation: panel-in 380ms var(--ease-out-expo) both;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion
+   ---------------------------------------------------------------------------
+   Movement goes away; state and feedback do not. Entrances resolve instantly
+   at their final position, the grid stops drifting but stays visible as
+   texture, and hover still reads through fill and stroke rather than a lift.
+--------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .ledger-grid::before,
+  .ledger-grid::after {
+    animation: none;
+    will-change: auto;
+  }
+
+  .wordmark-letter,
+  .wordmark-rule,
+  .settle-in,
+  .map-state-enter,
+  .panel-backdrop,
+  .panel-sheet {
+    animation-duration: 1ms;
+    animation-delay: 0ms !important;
+  }
+
+  .map-state,
+  .map-state-lift {
+    transition-duration: 1ms;
+  }
+
+  .map-state-lift {
+    transform: none;
+  }
 }

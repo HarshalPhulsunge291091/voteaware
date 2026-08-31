@@ -19,6 +19,12 @@ colors:
   text-mid: "#a7a6bd"
   text-low: "#6d6c85"
 typography:
+  wordmark:
+    fontFamily: "Sora, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "clamp(3rem, 11vw, 5rem)"
+    fontWeight: 800
+    lineHeight: 1
+    letterSpacing: "-0.04em"
   display:
     fontFamily: "Sora, ui-sans-serif, system-ui, sans-serif"
     fontSize: "clamp(2.15rem, 5vw, 3.75rem)"
@@ -116,6 +122,7 @@ The palette is a single dark neutral scale plus one committed accent and a three
 **Character:** Sora is geometric and slightly rounded, carrying every numeral and heading with a confident, fintech-native weight; Manrope is a plain, highly legible grotesk for body copy and UI chrome. The pairing reads as "engineered but human," never corporate-bureaucratic.
 
 ### Hierarchy
+- **Wordmark** (800, `clamp(3rem, 11vw, 5rem)`, 1.0 line-height, `-0.04em`): the "VoteAware" lockup on the landing hero, and nothing else. It is the only type in the system allowed above the Display step, and it appears exactly once in the product — the home page H1. Any second use is a defect.
 - **Display** (700, `clamp(2.15rem, 5vw, 3.75rem)`, 1.08 line-height): page H1s only — one per page.
 - **Headline** (700, 1.5rem–1.875rem): section headings ("Most left unspent", "Browse MPs").
 - **Title** (600–700, 1rem–1.125rem): card/list item primary text (MP name, work title).

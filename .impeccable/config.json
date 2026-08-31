@@ -9,6 +9,21 @@
         "value": "4px",
         "createdAt": "2026-08-30T13:15:08.569Z",
         "reason": "global :focus-visible outline radius on arbitrary elements, not a component shape from the rounded scale"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#000",
+        "createdAt": "2026-08-30T20:05:46.503Z",
+        "reason": "mask-image stencil in .ledger-grid: masks read alpha only, so the hue is inert and is not a palette color"
+      },
+      {
+        "rule": "codex-grid-background",
+        "value": "*",
+        "files": [
+          "src/index.css"
+        ],
+        "createdAt": "2026-08-30T20:18:26.185Z",
+        "reason": "user confirmed: explicitly requested a moving grid background for the landing hero, and it sits behind the India map surface"
       }
     ]
   }

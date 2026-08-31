@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { MPS, utilizationPct, type Grade } from "../data/mps";
+import { MPS, spentPctOfEntitlement, constituencyLabel, type Grade } from "../data/mps";
 import { GradeBadge } from "../components/GradeBadge";
 
 const GRADES: Grade[] = ["A", "B", "C", "D", "F", "N/A"];
@@ -102,14 +102,21 @@ export function MPList() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold text-[var(--color-text-hi)]">{mp.name}</p>
                   <p className="truncate text-sm text-[var(--color-text-mid)]">
-                    {mp.constituency}, {mp.state} · {mp.party}
+                    {constituencyLabel(mp.constituency, mp.state)}, {mp.state} · {mp.party}
                   </p>
                 </div>
+                {/* The share of the allotted pot that was spent, with the pot
+                    itself underneath — a bare percentage hides whether it was
+                    ₹17 Cr or ₹2 Cr on the line. */}
                 <div className="hidden shrink-0 text-right sm:block">
                   <p className="tabular font-display text-base font-bold text-[var(--color-text-hi)]">
-                    {utilizationPct(mp) !== null ? `${utilizationPct(mp)}%` : "—"}
+                    {spentPctOfEntitlement(mp) !== null ? `${spentPctOfEntitlement(mp)}%` : "—"}
                   </p>
-                  <p className="text-xs text-[var(--color-text-low)]">funds used</p>
+                  <p className="tabular text-xs text-[var(--color-text-low)]">
+                    {mp.fundsEntitledCr !== null
+                      ? `of ₹${mp.fundsEntitledCr.toFixed(1)} Cr allotted`
+                      : "no fund record"}
+                  </p>
                 </div>
               </Link>
             </li>

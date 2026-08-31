@@ -18,7 +18,7 @@ checkout either. These are independent public sources instead.
 | PC boundaries | `fetch-constituency-boundaries.mjs` | 543 | Lok Sabha constituency shapes (2019 delimitation, CC0) |
 | **Merged** | `merge.mjs` | 537 | Roster + PRS + MyNeta + MPLADS joined per MP by constituency |
 | **Candidates** | `merge.mjs` | 463/537 MPs have a candidate list | Separate file — see "Wired into the app" |
-| **Geo** | `build-geo.mjs` | 35 states, 535/537 MPs mapped | State + per-state constituency shapes for the map — see below |
+| **Geo** | `build-geo.mjs` | 36 states, 537/537 MPs mapped | State + per-state constituency shapes for the map — see below |
 
 Match rates in the merged output: 465/537 to PRS, 463/537 to MyNeta, 511/537
 to MPLADS, 463/537 to full candidate lists.
@@ -187,13 +187,28 @@ boundary file, not guessed), then:
   shapes + per-seat MP data, loaded on demand by the UI →
   `src/data/geo/pc/<state-slug>.json`.
 
-**Known gaps, left unmapped rather than approximated**: `Anantnag-Rajouri`
-(J&K's 2022 delimitation merged two former seats into one new boundary that
-doesn't exist in this 2019-delimitation file) and `Ladakh` (split from J&K
-in Aug 2019, after this boundary snapshot, so it has no separate polygon
-here). Both MPs still appear in list/search views — they just don't render
-on the map. Full reasoning and the alias table live in `build-geo.mjs`'s
-header comment.
+**All 537 MPs now have a shape.** Two seats needed special handling:
+
+- `Ladakh` became a separate UT in Aug 2019, after this boundary snapshot,
+  so it has no `st_name` of its own — but its constituency polygon *is*
+  present, filed under `Jammu & Kashmir`. It was previously being dropped by
+  the state-name join, which silently removed 179,000 km² (Leh, Kargil, and
+  the whole claimed northern region) from the rendered map. Pointing the
+  Ladakh state alias at `Jammu & Kashmir` restores it; it still groups into
+  its own state feature, since grouping keys on the MP's state, not the geo
+  name.
+- `Anantnag-Rajouri` is a new 2022-delimitation seat with no exact shape in
+  a 2019 file. It is drawn with the old `Anantnag` polygon — the closest
+  real, non-overlapping shape — so the Kashmir valley has no hole in it. The
+  shape is therefore slightly smaller than the seat actually is; the MP,
+  party, and fund figures attached to it are exact.
+
+**Northern boundary**: this DataMeet file already uses India's official
+(Survey of India) depiction. Verified by point-in-polygon test — the Ladakh
+constituency polygon contains Gilgit, Muzaffarabad, and Aksai Chin. Nothing
+is redrawn or clipped by this pipeline.
+
+Full reasoning and the alias table live in `build-geo.mjs`'s header comment.
 
 ## Wired into the app
 
@@ -204,8 +219,14 @@ derives the rest at import time:
 - `grade`/`gradeNote` — computed only from whichever of attendance % and
   fund-utilization % actually matched for that MP; an MP matching neither
   source gets grade `"N/A"`, never a guessed letter.
-- `partyColor` — a deterministic hash of the party name to an HSL color, not
-  a hand-curated list (there are 30+ distinct party strings in the data).
+- `partyColor` — from `src/data/party-colors.ts`, the single source of truth
+  for party colour across the national map, the state panel, and MP pages.
+  Every party that leads a state is pinned to a distinct colour so the
+  national map can never be ambiguous; the ~30 remaining parties hash into a
+  separation-tuned ramp. Colours are deliberately **not** baked into the geo
+  files — an earlier copy of this function lived in `build-geo.mjs` as well,
+  and both hashing BJP and INC to near-identical purples is what made the
+  first version of the map unreadable.
 - `photoInitials` — derived from the MP's name.
 
 The UI (`MPDetail.tsx`) shows `fundsDataTerm` next to every fund figure so
@@ -259,9 +280,9 @@ Run `npm run pipeline:sync` after re-running the merge to copy the fresh
      per-MP totals, not itemized works (checked all three of its resources).
    Revisit if a free mirror of the work-level dataset turns up, or if the
    user decides to provide their own dataful.in credentials.
-5. `Anantnag-Rajouri` and `Ladakh` have no shape on the map (see "Constituency
-   + state boundaries" above) — revisit if a post-2019-delimitation boundary
-   file for J&K/Ladakh turns up somewhere freely licensed.
+5. `Anantnag-Rajouri` is drawn with the pre-2022 `Anantnag` boundary (see
+   "Constituency + state boundaries" above) — swap in the real shape if a
+   post-2022-delimitation J&K boundary file turns up freely licensed.
 6. The state-level map colors by whichever party holds the most seats in
    that state — for closely contested states this can read as more
    one-sided than the seat count actually is. Consider a "seat share" detail

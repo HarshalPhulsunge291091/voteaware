@@ -17,7 +17,8 @@
     "pipeline:sync": "node scripts/pipeline/sync-to-app.mjs",
     "pipeline:geo-boundaries": "node scripts/pipeline/fetch-constituency-boundaries.mjs",
     "pipeline:geo-build": "node scripts/pipeline/build-geo.mjs",
-    "pipeline:all": "npm run pipeline:sansad && npm run pipeline:prs && npm run pipeline:myneta && npm run pipeline:myneta-candidates && npm run pipeline:mplads && npm run pipeline:merge && npm run pipeline:sync && npm run pipeline:geo-boundaries && npm run pipeline:geo-build"
+    "pipeline:all": "npm run pipeline:sansad && npm run pipeline:prs && npm run pipeline:myneta && npm run pipeline:myneta-candidates && npm run pipeline:mplads && npm run pipeline:merge && npm run pipeline:sync && npm run pipeline:geo-boundaries && npm run pipeline:geo-build",
+    "verify:colors": "node scripts/pipeline/verify-party-colors.mjs"
   },
   "dependencies": {
     "d3-geo": "^3.1.1",

@@ -24,8 +24,8 @@
 //     official/older names for seats commonly called Guwahati / Bhongir.
 //   - Jammu & Kashmir's 2022 delimitation merged parts of the old Anantnag
 //     and (non-LS) Rajouri area into a new "Anantnag-Rajouri" seat. That
-//     boundary does not exist in this 2019-delimitation file — the seat is
-//     left unmapped (no shape) rather than approximated.
+//     exact boundary does not exist in this 2019-delimitation file, so the
+//     seat is drawn with the old Anantnag polygon — see the alias note below.
 //   - A handful of others are pure spelling differences (Mahbubnagar vs
 //     Mahabubnagar, Cooch Behar vs Coochbehar, etc.) — see
 //     CONSTITUENCY_ALIASES below for the full list.
@@ -33,10 +33,15 @@
 // State-name reconciliation: our MP data uses current official names
 // (Odisha, NCT of Delhi) while the 2019 boundary file predates some of
 // those; Ladakh (split from Jammu & Kashmir in Aug 2019, after this
-// boundary snapshot) has no separate polygon here — its one LS seat is
-// left unmapped for the same reason as Anantnag-Rajouri. Dadra & Nagar
-// Haveli and Daman & Diu were separate UTs in 2019 (now merged) — their two
-// polygons are dissolved together into the single state feature.
+// boundary snapshot) has no st_name here but its seat does exist under
+// "Jammu & Kashmir" — see STATE_ALIASES. Dadra & Nagar Haveli and Daman &
+// Diu were separate UTs in 2019 (now merged) — their two polygons are
+// dissolved together into the single state feature.
+//
+// Northern boundary: this DataMeet file already uses India's official
+// (Survey of India) depiction — verified by point-in-polygon test, the
+// Ladakh constituency polygon contains Gilgit, Muzaffarabad, and Aksai
+// Chin. Nothing is redrawn or clipped here.
 //
 // Run: node scripts/pipeline/build-geo.mjs
 // Requires: data/pc-boundaries-raw.geojson (fetch-constituency-boundaries.mjs),
@@ -91,8 +96,15 @@ const CONSTITUENCY_ALIASES = {
   KAZIRANGA: "KALIABOR",
   DIPHU: "AUTONOMOUS DISTRICT",
   KANNIYAKUMARI: "KANYAKUMARI",
-  // No entry for ANANTNAG-RAJOURI (J&K) — genuinely new 2022-delimitation
-  // merged seat, no corresponding shape in this 2019 boundary file.
+  // ANANTNAG-RAJOURI is a new 2022-delimitation seat with no exact shape in
+  // this 2019 file: it kept most of old Anantnag and absorbed the
+  // Rajouri/Poonch belt that previously sat in Jammu/Udhampur. Mapped to the
+  // old ANANTNAG polygon — the closest real, non-overlapping shape available.
+  // Previously left unmapped, which punched a visible hole in the Kashmir
+  // valley on the national map; an approximate-but-documented shape beats a
+  // hole. The seat's shape is therefore slightly smaller than reality; the
+  // MP, party, and fund figures attached to it are exact.
+  "ANANTNAG-RAJOURI": "ANANTNAG",
 };
 
 // mp.state -> geo st_name(s). An array means those geo states get dissolved
@@ -103,24 +115,28 @@ const STATE_ALIASES = {
   "Andaman and Nicobar Islands": ["Andaman & Nicobar"],
   "Jammu and Kashmir": ["Jammu & Kashmir"],
   "Dadra and Nagar Haveli and Daman and Diu": ["Dadra & Nagar Haveli", "Daman & Diu"],
-  // Ladakh has no separate polygon in this file (split from J&K in Aug
-  // 2019, after this snapshot) — left out of the state map entirely; its
-  // one MP still appears in list/search views, just not on the map.
+  // Ladakh became a separate UT in Aug 2019, after this boundary snapshot,
+  // so it has no st_name of its own here — but its single Lok Sabha seat
+  // ("Ladakh") IS present, filed under Jammu & Kashmir. Pointing Ladakh at
+  // that state name lets the per-constituency lookup below find it, and it
+  // still gets grouped into its own state feature (grouping is keyed by
+  // mp.state, not the geo name).
+  //
+  // This matters far more than one seat: the Ladakh PC polygon is 179,000
+  // km² — it carries Leh, Kargil, and the whole claimed northern region
+  // (Gilgit-Baltistan, PoK, Aksai Chin) that India's official maps include.
+  // Dropping it removed most of India's north from the rendered map.
+  Ladakh: ["Jammu & Kashmir"],
 };
 
 function geoStateNames(mpState) {
   return STATE_ALIASES[mpState] ?? [mpState];
 }
 
-function partyColor(party) {
-  let hash = 0;
-  for (let i = 0; i < party.length; i++) {
-    hash = (hash << 5) - hash + party.charCodeAt(i);
-    hash |= 0;
-  }
-  const hue = Math.abs(hash) % 360;
-  return `hsl(${hue}, 62%, 46%)`;
-}
+// NOTE: party colours are deliberately NOT baked into these files. They are
+// derived at render time from src/data/party-colors.ts, which is the single
+// source of truth — an earlier copy of the colour function lived here too, and
+// the two drifting apart is exactly the failure mode worth designing out.
 
 function stateSlug(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -170,7 +186,6 @@ async function main() {
         name: mp.name,
         constituency: mp.constituency,
         party: mp.party,
-        partyColor: partyColor(mp.party),
         grade: null, // computed client-side in src/data/mps.ts; not duplicated here
         fundsUnspentCr: mp.fundsUnspentCr,
         fundsDataTerm: mp.fundsDataTerm,
@@ -219,7 +234,6 @@ async function main() {
         slug: stateSlug(state),
         seatCount: features.length,
         leadingParty,
-        leadingPartyColor: partyColor(leadingParty),
         totalUnspentCr: Number(totalUnspentCr.toFixed(2)),
         seatsWithFundsData,
       },
@@ -251,7 +265,7 @@ async function main() {
   const unmapped = mps.length - matched;
   if (unmapped > 0) {
     console.log(
-      `${unmapped} MP(s) have no boundary shape (see script header for documented gaps: Anantnag-Rajouri, Ladakh).`,
+      `${unmapped} MP(s) have no boundary shape (see script header for documented gaps).`,
     );
   }
 }

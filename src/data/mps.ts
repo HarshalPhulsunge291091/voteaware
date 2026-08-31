@@ -1,4 +1,5 @@
 import rawMps from "./mps-merged.json";
+import { partyColor } from "./party-colors";
 
 export type Grade = "A" | "B" | "C" | "D" | "F" | "N/A";
 
@@ -46,18 +47,6 @@ export interface MP extends MergedRecord {
   photoInitials: string;
   grade: Grade;
   gradeNote: string;
-}
-
-// Deterministic hash so the same party always gets the same colour across
-// sessions/builds, without maintaining a hand-curated list for 30+ parties.
-function partyColor(party: string): string {
-  let hash = 0;
-  for (let i = 0; i < party.length; i++) {
-    hash = (hash << 5) - hash + party.charCodeAt(i);
-    hash |= 0;
-  }
-  const hue = Math.abs(hash) % 360;
-  return `hsl(${hue}, 62%, 46%)`;
 }
 
 function photoInitials(name: string): string {
@@ -140,8 +129,49 @@ export function unspentCr(mp: MP): number {
   return mp.fundsUnspentCr ?? 0;
 }
 
+/**
+ * Constituency name with a redundant trailing "(State)" trimmed for display —
+ * some source names carry it ("Tripura East (ST) (Tripura)"), which then reads
+ * twice wherever the state is shown alongside. Only an exact match on the
+ * given state is removed, so meaningful parentheticals like the (SC)/(ST)
+ * reservation markers survive. Display only; the stored record is untouched.
+ */
+export function constituencyLabel(constituency: string, state: string): string {
+  const suffix = ` (${state})`;
+  return constituency.endsWith(suffix) ? constituency.slice(0, -suffix.length) : constituency;
+}
+
+/**
+ * The source's own reported utilisation figure — spending measured against
+ * funds *released*, not against entitlement. Passed through untouched.
+ */
 export function utilizationPct(mp: MP): number | null {
   return mp.fundsUtilizationPct !== null ? Math.round(mp.fundsUtilizationPct) : null;
+}
+
+/**
+ * How much of the MP's full MPLADS entitlement actually got spent.
+ *
+ * This is the figure a voter is really asking about — "of the money meant for
+ * my constituency, how much became something?" — and it is computed here from
+ * two numbers in the same source row, so the arithmetic is exact.
+ *
+ * Deliberately NOT derived from the source's `fundsUtilizationPct`, and not
+ * interchangeable with it. Those columns do not reconcile with each other:
+ * `unspent` equals `received − spent` for only 3 of 511 records, and the
+ * reported utilisation matches `spent/received` for only 71 of 511 — the
+ * figures appear to cover different accounting windows (carry-over balances,
+ * interest, and releases conditional on utilisation certificates). Only
+ * entitled-vs-spent divides cleanly, which is why it is the one ratio this
+ * app computes itself. Keep the two labelled distinctly in the UI.
+ *
+ * Across the 508 MPs with both figures: median 44%, range 0–102%.
+ */
+export function spentPctOfEntitlement(mp: MP): number | null {
+  if (mp.fundsEntitledCr === null || mp.fundsSpentCr === null || mp.fundsEntitledCr <= 0) {
+    return null;
+  }
+  return Math.round((mp.fundsSpentCr / mp.fundsEntitledCr) * 100);
 }
 
 // Candidates (winner + everyone who lost, per constituency) live in their

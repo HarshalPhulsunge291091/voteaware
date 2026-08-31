@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getMPById, loadCandidates, unspentCr, utilizationPct, type Candidate } from "../data/mps";
+import { getMPById, loadCandidates, unspentCr, utilizationPct, spentPctOfEntitlement, constituencyLabel, type Candidate } from "../data/mps";
 import { GradeBadge } from "../components/GradeBadge";
 import { StatusPill } from "../components/StatusPill";
 
@@ -40,6 +40,7 @@ export function MPDetail() {
 
   const util = utilizationPct(mp);
   const unspent = unspentCr(mp);
+  const spentPct = spentPctOfEntitlement(mp);
   const hasFunds = mp.fundsEntitledCr !== null;
 
   return (
@@ -61,7 +62,7 @@ export function MPDetail() {
             {mp.name}
           </h1>
           <p className="mt-0.5 text-[var(--color-text-mid)]">
-            {mp.constituency}, {mp.state} · {mp.party}
+            {constituencyLabel(mp.constituency, mp.state)}, {mp.state} · {mp.party}
           </p>
           {mp.termsServed && (
             <p className="mt-0.5 text-xs text-[var(--color-text-low)]">
@@ -123,18 +124,34 @@ export function MPDetail() {
               </div>
             </dl>
 
-            {util !== null && (
+            {/* Two different denominators, shown separately on purpose. The
+                entitlement share is ours and divides exactly; the released
+                share is the source's own reported figure. They are not
+                interchangeable and the source's columns do not reconcile with
+                each other — see spentPctOfEntitlement() in data/mps.ts. */}
+            {spentPct !== null && (
               <div className="mt-2">
                 <div className="h-2 overflow-hidden rounded-full bg-[var(--color-ink-border)]">
                   <div
                     className="h-full rounded-full"
-                    style={{ width: `${Math.min(100, util)}%`, background: "var(--color-accent)" }}
+                    style={{
+                      width: `${Math.min(100, spentPct)}%`,
+                      background: "var(--color-accent)",
+                    }}
                   />
                 </div>
-                <p className="mt-2 text-xs text-[var(--color-text-low)]">
-                  {util}% of released funds spent
+                <p className="tabular mt-2 text-xs text-[var(--color-text-hi)]">
+                  <span className="font-semibold">{spentPct}%</span> of the full ₹
+                  {mp.fundsEntitledCr!.toFixed(2)} Cr entitlement was spent
                 </p>
               </div>
+            )}
+
+            {util !== null && (
+              <p className="tabular mt-3 text-xs text-[var(--color-text-low)]">
+                Against funds actually released rather than entitled, the source reports {util}%
+                utilisation.
+              </p>
             )}
           </>
         ) : (
@@ -249,7 +266,7 @@ export function MPDetail() {
       {candidates.length > 0 && (
         <section className="mt-8 mb-4">
           <h2 className="font-display text-lg font-bold text-[var(--color-text-hi)]">
-            Who else ran in {mp.constituency}
+            Who else ran in {constituencyLabel(mp.constituency, mp.state)}
           </h2>
           <p className="mt-1 text-sm text-[var(--color-text-mid)]">
             {candidates.length - 1} other candidate
